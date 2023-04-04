@@ -15,13 +15,13 @@ int main(){
     std::cerr << "Starting..." << std::endl;
     for (int y = height - 1; y >= 0; --y){
         for (int x = 0; x < width; ++x) {
-            const auto c = color{
+            const auto c = Color{
                 static_cast<double>(x) / (width),
                 static_cast<double>(y) / (height),
                 0.25
             };
             
-            write_color(std::cout, 256. * c);
+            std::cout << 256. * c << std::endl;
         }
     }  
     std::cerr << fmt::format("Wrote {} pixels", width*height) << std::endl;

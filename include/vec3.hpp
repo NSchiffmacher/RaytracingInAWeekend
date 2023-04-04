@@ -5,7 +5,8 @@
 namespace raytracing
 {
 
-using vec3 = Eigen::Matrix<double, 3, 1>;
+using Vector3 = Eigen::Matrix<double, 3, 1>;
+using Point3 = Eigen::Matrix<double, 3, 1>;
 // provides : .norm()
 // .squaredNorm()
 
