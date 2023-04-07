@@ -2,27 +2,49 @@
 #include <fmt/core.h>
 
 #include <color.hpp>
-// #include <vec3.hpp>
+#include <ray.hpp>
+#include <image.hpp>
+#include <vec3.hpp>
 
 using namespace raytracing;
 
+Color rayColor(const Ray& ray)
+{
+    auto t = 0.5 * (ray.dy() + 1.0);
+    return (1.-t) * Color{1., 1., 1.} + t * Color{0.5, 0.7, 1.};
+}
+
 int main(){
-    const int width = 256;  
-    const int height = 256;
+    // Image
+    const auto aspect_ratio = 16./9.;
+    const auto width = 400;  
+    const auto height = static_cast<int>(width / aspect_ratio);
 
-    std::cout << "P3\n" << width << " " << height << "\n255\n";
+    // Camera
+    auto viewport_height = 2.0;
+    auto viewport_width = viewport_height * aspect_ratio;
+    auto focal_length = 1.0;
 
-    std::cerr << "Starting..." << std::endl;
-    for (int y = height - 1; y >= 0; --y){
-        for (int x = 0; x < width; ++x) {
-            const auto c = Color{
-                static_cast<double>(x) / (width),
-                static_cast<double>(y) / (height),
-                0.25
-            };
-            
-            std::cout << 256. * c << std::endl;
+    auto origin = Point3{0., 0., 0.};
+    auto horizontal = Vector3{viewport_width, 0., 0.};
+    auto vertical = Vector3{0., viewport_height, 0.};
+    auto lower_left_corner = Vector3{origin - horizontal / 2 - vertical / 2 - Vector3{0., 0., focal_length}};
+
+    // Render
+    std::cout << write_header(width, height) << std::endl;
+    std::cerr << "Start rending..." << std::endl;
+    for (int j = height-1; j >= 0; --j)
+    {
+        std::cerr << fmt::format("[{:.2f}%] Rendering line {}/{}", (1-static_cast<double>(j)/(height-1)) * 100., height-j, height) << std::endl;
+        for (int i = 0; i < width; ++i)
+        {
+            auto u = static_cast<double>(i) / (width-1);
+            auto v = static_cast<double>(j) / (height-1);
+
+            auto ray = Ray{origin, Vector3{lower_left_corner + u * horizontal + v * vertical - origin}};
+            auto pixel_color = rayColor(ray);
+            std::cout << pixel_color << std::endl;
         }
-    }  
-    std::cerr << fmt::format("Wrote {} pixels", width*height) << std::endl;
+    } 
+    std::cerr << "Done rending !" << std::endl;
 }

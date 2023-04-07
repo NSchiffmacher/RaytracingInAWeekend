@@ -1,4 +1,4 @@
 
 
 
-add_executable(Raycasting main.cpp color.cpp)
+add_executable(Raycasting main.cpp color.cpp image.cpp)
