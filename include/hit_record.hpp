@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vec3.hpp>
+#include <hit_record.hpp>
 #include <optional>
 
 namespace raytracing

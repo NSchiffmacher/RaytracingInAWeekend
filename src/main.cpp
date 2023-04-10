@@ -1,23 +1,22 @@
+#include <common.hpp>
+#include <image.hpp>
+
+#include <shapes/shape.hpp>
+#include <shapes/sphere.hpp>
+
+#include <limits>
 #include <iostream>
 #include <fmt/core.h>
 
-#include <color.hpp>
-#include <ray.hpp>
-#include <image.hpp>
-#include <vec3.hpp>
+using namespace raytracing; 
 
-#include <shapes/sphere.hpp>
-
-using namespace raytracing;
-
-Color rayColor(const Ray& ray, const Sphere& sphere)
+Color rayColor(const Ray& ray, const Hittables& world)
 {
     // check if intersect sphere
-    const auto intersect = ray.hit(sphere, 0, 10000000);
-    if (intersect.has_value())
+    const auto intersection_record = world.hit(ray, 0., std::numeric_limits<double>::infinity());
+    if (intersection_record.has_value())
     {
-        const auto record = intersect.value();
-        const auto n = record.normal;
+        const auto n = intersection_record->normal;
         return Color{0.5 * (n.x() + 1), 0.5 * (n.y() + 1), 0.5 * (n.z() + 1)};
     }
 
@@ -32,7 +31,10 @@ int main(){
     const auto width = 400;  
     const auto height = static_cast<int>(width / aspect_ratio);
 
-    const auto sphere = Sphere{Point3{0, 0, -1}, 0.5};
+    // Add items to the world
+    auto world = Hittables{};
+    world.add(std::make_unique<Sphere>(Point3{0, 0, -1}, 0.5));
+    world.add(std::make_unique<Sphere>(Point3{0, -100.5, -1}, 100)); // "ground" as a sphere
 
     // Camera
     auto viewport_height = 2.0;
@@ -56,10 +58,12 @@ int main(){
             auto v = static_cast<double>(j) / (height-1);
 
             auto ray = Ray{origin, Vector3{lower_left_corner + u * horizontal + v * vertical - origin}};
-            auto pixel_color = rayColor(ray, sphere);
+            auto pixel_color = rayColor(ray, world);
             std::cout << pixel_color << "\n";
         }
     } 
     std::cout << std::flush;
     std::cerr << "Done rending !" << std::endl;
+    return 0;
 }
+
