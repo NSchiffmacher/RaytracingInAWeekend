@@ -13,8 +13,13 @@ using namespace raytracing;
 Color rayColor(const Ray& ray, const Sphere& sphere)
 {
     // check if intersect sphere
-    if (sphere.intersectRay(ray))
-        return Color{1, 0, 0};
+    const auto intersect = ray.hit(sphere, 0, 10000000);
+    if (intersect.has_value())
+    {
+        const auto record = intersect.value();
+        const auto n = record.normal;
+        return Color{0.5 * (n.x() + 1), 0.5 * (n.y() + 1), 0.5 * (n.z() + 1)};
+    }
 
     // background
     auto t = 0.5 * (ray.dy() + 1.0);

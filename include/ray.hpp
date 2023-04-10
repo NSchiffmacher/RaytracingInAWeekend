@@ -1,6 +1,9 @@
 #pragma once
 
 #include <vec3.hpp>
+#include <shapes/shape.hpp>
+#include <hit_record.hpp>
+#include <optional>
 
 namespace raytracing
 {
@@ -20,6 +23,8 @@ public:
     inline double dx() const { return m_direction.x(); };
     inline double dy() const { return m_direction.y(); };
     inline double dz() const { return m_direction.z(); };
+
+    inline std::optional<HitRecord> hit(const Shape& shape, double t_min, double t_max) const { return shape.hit(*this, t_min, t_max); }
 
     inline Point3 at(double t) const { return m_origin + t * m_direction; };
     inline Point3 operator()(double t) const { return at(t); };
