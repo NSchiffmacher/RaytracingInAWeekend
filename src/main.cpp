@@ -1,5 +1,6 @@
 #include <common.hpp>
 #include <image.hpp>
+#include <camera.hpp>
 
 #include <shapes/shape.hpp>
 #include <shapes/sphere.hpp>
@@ -30,6 +31,7 @@ int main(){
     const auto aspect_ratio = 16./9.;
     const auto width = 400;  
     const auto height = static_cast<int>(width / aspect_ratio);
+    const auto samples_per_pixel = 100;
 
     // Add items to the world
     auto world = Hittables{};
@@ -37,14 +39,9 @@ int main(){
     world.add(std::make_unique<Sphere>(Point3{0, -100.5, -1}, 100)); // "ground" as a sphere
 
     // Camera
-    auto viewport_height = 2.0;
-    auto viewport_width = viewport_height * aspect_ratio;
-    auto focal_length = 1.0;
-
-    auto origin = Point3{0., 0., 0.};
-    auto horizontal = Vector3{viewport_width, 0., 0.};
-    auto vertical = Vector3{0., viewport_height, 0.};
-    auto lower_left_corner = Vector3{origin - horizontal / 2 - vertical / 2 - Vector3{0., 0., focal_length}};
+    const auto viewport_height = 2.;
+    const auto focal_length = 1.;
+    auto camera = Camera{viewport_height * aspect_ratio, viewport_height, focal_length};
 
     // Render
     std::cout << write_header(width, height) << "\n";
@@ -54,11 +51,15 @@ int main(){
         std::cerr << fmt::format("[{:.2f}%] Rendering line {}/{}", (1-static_cast<double>(j)/(height-1)) * 100., height-j, height) << std::endl;
         for (int i = 0; i < width; ++i)
         {
-            auto u = static_cast<double>(i) / (width-1);
-            auto v = static_cast<double>(j) / (height-1);
+            auto pixel_color = ColorAccumulator(samples_per_pixel);
+            for (int s = 0; s < samples_per_pixel; s++)
+            {
+                auto u = (static_cast<double>(i) + random_double()) / (width-1);
+                auto v = (static_cast<double>(j) + random_double()) / (height-1);
 
-            auto ray = Ray{origin, Vector3{lower_left_corner + u * horizontal + v * vertical - origin}};
-            auto pixel_color = rayColor(ray, world);
+                auto ray = camera.getRay(u, v);
+                pixel_color += rayColor(ray, world);
+            }
             std::cout << pixel_color << "\n";
         }
     } 
