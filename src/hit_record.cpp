@@ -4,11 +4,10 @@
 namespace raytracing
 {
 
-const HitRecord& HitRecord::setFaceNormal(const Ray& ray, const Vector3& outward_normal)
+HitRecord::HitRecord(double t, const Point3& point, const Ray& ray, const Vector3& outward_normal): t{t}, point{point}
 {
   front_face = ray.direction().dot(outward_normal);
   normal = front_face ? outward_normal : - outward_normal;
-  return *this;
 }
 
 } // namespace raytracing

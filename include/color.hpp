@@ -51,8 +51,8 @@ public:
     friend std::ostream& operator<<(std::ostream& out, Color pixel_color);
 protected:
     Eigen::Matrix<double, 4, 1> m_color;
-    double m_max;
     double m_min;
+    double m_max;
 };
 
 class ColorAccumulator: public Color

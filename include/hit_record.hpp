@@ -16,7 +16,7 @@ struct HitRecord
   Vector3 normal;
   bool front_face;
 
-  const HitRecord& setFaceNormal(const Ray& ray, const Vector3& outward_normal);
+  HitRecord(double t, const Point3& point, const Ray& ray, const Vector3& outward_normal);
 };
 
 } // namespace raytracing

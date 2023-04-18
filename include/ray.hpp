@@ -4,6 +4,7 @@
 #include <shapes/shape.hpp>
 #include <hit_record.hpp>
 #include <optional>
+#include <limits>
 
 namespace raytracing
 {
@@ -26,8 +27,10 @@ public:
 
     inline std::optional<HitRecord> hit(const Shape& shape, double t_min, double t_max) const { return shape.hit(*this, t_min, t_max); }
 
-    inline Point3 at(double t) const { return m_origin + t * m_direction; };
-    inline Point3 operator()(double t) const { return at(t); };
+    inline Point3 at(double t) const { 
+        return Point3{m_origin + (t + std::numeric_limits<double>::epsilon() * 10) * m_direction}; // can't make it work without the epsilon ??
+    }
+    inline Point3 operator()(double t) const { return at(t); }
 
 private:
     Point3 m_origin;
