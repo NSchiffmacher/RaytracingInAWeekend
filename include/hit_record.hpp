@@ -8,6 +8,7 @@ namespace raytracing
 {
 
 class Ray;
+class Material;
 
 struct HitRecord
 {
@@ -15,8 +16,9 @@ struct HitRecord
   Point3 point;
   Vector3 normal;
   bool front_face;
+  Material* material;
 
-  HitRecord(double t, const Point3& point, const Ray& ray, const Vector3& outward_normal);
+  HitRecord(double t, const Point3& point, const Ray& ray, const Vector3& outward_normal, Material* mat);
 };
 
 } // namespace raytracing

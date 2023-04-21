@@ -23,7 +23,7 @@ std::optional<HitRecord> Sphere::hit(const Ray& ray, double t_min, double t_max)
 
   const auto p = ray(t);
   const auto n = Vector3{(p - m_center) / m_radius};
-  return HitRecord{t, p, ray, n};
+  return HitRecord{t, p, ray, n, m_material};
 }
 
 } // namespace raytracing

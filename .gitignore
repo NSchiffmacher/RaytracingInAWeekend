@@ -2,4 +2,4 @@ build/
 archive/
 .vscode/
 .cache/
-img.ppm
+img.*

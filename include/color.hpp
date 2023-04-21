@@ -32,6 +32,7 @@ public:
 
     inline Color operator+(const Color& other) const { return Color{m_color + other.m_color}; };
     inline Color& operator+=(const Color& other) { m_color += other.m_color; clampValues(); return *this; };
+    inline Color operator*(const Color& other) const { return Color{r() * other.r(), g() * other.g(), b() * other.b()}; };
     inline Color operator*(double constant) const { return Color{m_color * constant}; };
     inline Color& operator*=(double constant) { m_color*= constant; clampValues(); return *this; };
     inline Color operator/(double constant) const { return *this * (1/constant); };

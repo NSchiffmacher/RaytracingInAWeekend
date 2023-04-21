@@ -5,16 +5,19 @@
 #include <shapes/shape.hpp>
 #include <shapes/sphere.hpp>
 
+#include <materials/lambertian.hpp>
+#include <materials/metal.hpp>
+
 #include <limits>
 #include <chrono>
+#include <memory>
 #include <iostream>
 #include <fmt/core.h>
 
 using namespace raytracing; 
 
-enum class DiffuseScaterType { RandomHemisphere, RandomUnit, RandomSphere };
 
-Color rayColor(const Ray& ray, const Hittables& world, int depth, DiffuseScaterType diffuse_scater_type)
+Color rayColor(const Ray& ray, const Hittables& world, int depth)
 {
     const auto min_t = 0.001; // hits with a value of t being less than this value are ignored
     // if I understand it correctly, it helps get rid of ray colliding with the object they reflect out of
@@ -23,19 +26,11 @@ Color rayColor(const Ray& ray, const Hittables& world, int depth, DiffuseScaterT
     const auto intersection_record = world.hit(ray, min_t, std::numeric_limits<double>::infinity());
     if (intersection_record.has_value())
     {
-        // const auto n = intersection_record->normal;
-        // return Color{0.5 * (n.x() + 1), 0.5 * (n.y() + 1), 0.5 * (n.z() + 1)};
-        // std::cerr << intersection_record->normal + random_in_unit_sphere() << std::endl;
-        switch(diffuse_scater_type)
-        {
-        case DiffuseScaterType::RandomSphere:
-            return 0.5 * rayColor(Ray{intersection_record->point, Vector3{intersection_record->normal + random_in_unit_sphere()}}, world, depth-1, diffuse_scater_type);
-        case DiffuseScaterType::RandomUnit:
-            return 0.5 * rayColor(Ray{intersection_record->point, Vector3{intersection_record->normal + random_unit_vector()}}, world, depth-1, diffuse_scater_type);
-        case DiffuseScaterType::RandomHemisphere:
-            return 0.5 * rayColor(Ray{intersection_record->point, Vector3{intersection_record->normal + random_in_hemisphere(intersection_record->normal)}}, world, depth-1, diffuse_scater_type);
-        }
-        
+        auto scatter_res = intersection_record->material->scatter(ray, intersection_record.value());
+        if (scatter_res.has_value())
+            return scatter_res->second * rayColor(scatter_res->first, world, depth - 1);
+        else 
+            return Color{0., 0., 0.}; // no light reflected        
     }
 
     // background
@@ -46,21 +41,27 @@ Color rayColor(const Ray& ray, const Hittables& world, int depth, DiffuseScaterT
 int main(){
     // Image (Semi-HD -> width = 1600 => random_scale = 0.5 => samples_per_pixel = 10)
     const auto aspect_ratio = 16./9.;
-    const auto width = 400;  
+    const auto width = 1600;  
     const auto height = static_cast<int>(width / aspect_ratio);
     const auto samples_per_pixel = 100; //100;
     const auto max_depth = 50; //100;
     const auto random_scale = 1.;
-    const auto diffuse_scater_type = DiffuseScaterType::RandomUnit;
+    const auto lambertian_diffuse_scatter_type = Lambertian::DiffuseScatterType::RandomUnit;
     // Debug 
     const auto freq_info_print = 50;
 
+    // Create the materials
+    auto material_ground = std::make_unique<Lambertian>(Color{0.8, 0.8, 0.}, lambertian_diffuse_scatter_type);
+    auto material_center = std::make_unique<Lambertian>(Color{0.7, 0.3, 0.3}, lambertian_diffuse_scatter_type);
+    auto material_left = std::make_unique<Metal>(Color{0.8, 0.8, 0.8}, 0.3);
+    auto material_right = std::make_unique<Metal>(Color{0.8, 0.6, 0.2}, 1.0);
+
     // Add items to the world
     auto world = Hittables{};
-    world.add(std::make_unique<Sphere>(Point3{0, 0, -1}, 0.5));
-    world.add(std::make_unique<Sphere>(Point3{1, 0, -1.1}, 0.3));
-    world.add(std::make_unique<Sphere>(Point3{-1, 0, -1.1}, 0.3));
-    world.add(std::make_unique<Sphere>(Point3{0, -100.5, -1}, 100)); // "ground" as a sphere
+    world.add(std::make_unique<Sphere>(Point3{0, 0, -1}, 0.5, material_center.get()));
+    world.add(std::make_unique<Sphere>(Point3{1, 0, -1}, 0.5, material_right.get()));
+    world.add(std::make_unique<Sphere>(Point3{-1, 0, -1}, 0.5, material_left.get()));
+    world.add(std::make_unique<Sphere>(Point3{0, -100.5, -1}, 100, material_ground.get())); // "ground" as a sphere
 
     // Camera
     const auto viewport_height = 2.;
@@ -83,7 +84,7 @@ int main(){
                 auto v = (static_cast<double>(j) + random_double() * random_scale) / (height-1);
 
                 auto ray = camera.getRay(u, v);
-                pixel_color += rayColor(ray, world, max_depth, diffuse_scater_type);
+                pixel_color += rayColor(ray, world, max_depth);
             }
             std::cout << pixel_color << "\n";
         }
