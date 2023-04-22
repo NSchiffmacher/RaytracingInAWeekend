@@ -15,3 +15,7 @@ add_test(NAME test_color COMMAND test_color)
 add_executable(test_ray test_ray.cpp)
 target_link_libraries(test_ray gtest_main)
 add_test(NAME test_ray COMMAND test_ray)
+
+add_executable(test_refract test_refract.cpp ../src/shapes/sphere.cpp ../src/shapes/shape.cpp ../src/color.cpp ../src/hit_record.cpp)
+target_link_libraries(test_refract gtest_main)
+add_test(NAME test_refract COMMAND test_refract)

@@ -1,6 +1,6 @@
 #include <shapes/sphere.hpp>
 #include <cmath>
-
+#include <iostream>
 namespace raytracing
 {
 
@@ -22,8 +22,11 @@ std::optional<HitRecord> Sphere::hit(const Ray& ray, double t_min, double t_max)
   }
 
   const auto p = ray(t);
-  const auto n = Vector3{(p - m_center) / m_radius};
-  return HitRecord{t, p, ray, n, m_material};
+  const auto n = Vector3{(p - m_center) / m_radius}.normalized();
+  const auto dot_prod = n.dot(ray.direction());
+
+  auto outside_sphere = dot_prod <= 0;
+  return HitRecord{t, p, ray, outside_sphere ? n : -n, outside_sphere, m_material};
 }
 
 } // namespace raytracing

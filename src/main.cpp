@@ -6,6 +6,7 @@
 #include <shapes/sphere.hpp>
 
 #include <materials/lambertian.hpp>
+#include <materials/diaelectric.hpp>
 #include <materials/metal.hpp>
 
 #include <limits>
@@ -41,10 +42,10 @@ Color rayColor(const Ray& ray, const Hittables& world, int depth)
 int main(){
     // Image (Semi-HD -> width = 1600 => random_scale = 0.5 => samples_per_pixel = 10)
     const auto aspect_ratio = 16./9.;
-    const auto width = 1600;  
+    const auto width = 400;  
     const auto height = static_cast<int>(width / aspect_ratio);
     const auto samples_per_pixel = 100; //100;
-    const auto max_depth = 50; //100;
+    const auto max_depth = 100; //100;
     const auto random_scale = 1.;
     const auto lambertian_diffuse_scatter_type = Lambertian::DiffuseScatterType::RandomUnit;
     // Debug 
@@ -52,15 +53,16 @@ int main(){
 
     // Create the materials
     auto material_ground = std::make_unique<Lambertian>(Color{0.8, 0.8, 0.}, lambertian_diffuse_scatter_type);
-    auto material_center = std::make_unique<Lambertian>(Color{0.7, 0.3, 0.3}, lambertian_diffuse_scatter_type);
-    auto material_left = std::make_unique<Metal>(Color{0.8, 0.8, 0.8}, 0.3);
-    auto material_right = std::make_unique<Metal>(Color{0.8, 0.6, 0.2}, 1.0);
+    auto material_center = std::make_unique<Lambertian>(Color{0.1, 0.2, 0.5});
+    auto material_left = std::make_unique<Diaelectric>(2.5);
+    auto material_right = std::make_unique<Metal>(Color{0.8, 0.6, 0.2}, 0.);
 
     // Add items to the world
     auto world = Hittables{};
     world.add(std::make_unique<Sphere>(Point3{0, 0, -1}, 0.5, material_center.get()));
     world.add(std::make_unique<Sphere>(Point3{1, 0, -1}, 0.5, material_right.get()));
     world.add(std::make_unique<Sphere>(Point3{-1, 0, -1}, 0.5, material_left.get()));
+    world.add(std::make_unique<Sphere>(Point3{-1, 0, -1}, 0.4, material_left.get()));
     world.add(std::make_unique<Sphere>(Point3{0, -100.5, -1}, 100, material_ground.get())); // "ground" as a sphere
 
     // Camera

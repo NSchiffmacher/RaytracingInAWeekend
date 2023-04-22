@@ -9,7 +9,7 @@ namespace raytracing
 class Lambertian: public Material
 {
 public:
-  enum class DiffuseScatterType { RandomHemisphere, RandomUnit, RandomSphere };
+  enum class DiffuseScatterType { RandomHemisphere, RandomUnit, RandomSphere, NoRandom };
 
   inline Lambertian(const Color& albedo, DiffuseScatterType scatter_type = DiffuseScatterType::RandomUnit): m_albedo{albedo}, m_scatter_type{scatter_type} {}
   
@@ -19,7 +19,8 @@ public:
     auto scatter_direction = Vector3{hit_record.normal + 
       (m_scatter_type == DiffuseScatterType::RandomUnit ? random_unit_vector() :
        m_scatter_type == DiffuseScatterType::RandomSphere ? random_in_unit_sphere() : 
-       /* m_scatter_type == DiffuseScatterType::RandomHemisphere ? */ random_in_hemisphere(hit_record.normal))};
+       m_scatter_type == DiffuseScatterType::RandomHemisphere ?  random_in_hemisphere(hit_record.normal) :
+    /* m_scatter_type == DiffuseScatterType::NoRandom ? */ Vector3{0., 0., 0.})};
     if (near_zero(scatter_direction)) // if the direction is near zero, set it back to the normal (might lead to NaN or Inf later otherwise)
       scatter_direction = hit_record.normal;
     return std::make_pair(Ray{hit_record.point, scatter_direction}, m_albedo);

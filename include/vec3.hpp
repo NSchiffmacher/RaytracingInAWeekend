@@ -18,6 +18,13 @@ inline Vector3 reflect(const Vector3& vector, const Vector3& normal)
 {
   return Vector3{vector - 2 * vector.dot(normal) * normal};
 }
+inline Vector3 refract(const Vector3& uv, const Vector3& n, double etai_over_etat) {
+  auto cos_theta = fmin(-uv.dot(n), 1.0);
+  Vector3 r_out_perp =  Vector3{etai_over_etat * (uv + cos_theta*n)};
+  Vector3 r_out_parallel = Vector3{-sqrt(fabs(1.0 - r_out_perp.squaredNorm())) * n};
+  return r_out_perp + r_out_parallel;
+}
+
 // provides : .norm()
 // .squaredNorm()
 
