@@ -9,9 +9,11 @@ class Camera
 {
 public:
   Camera();
-  Camera(double viewport_width, double viewport_height, double focal_length);
 
-  Ray getRay(double u, double v) const;
+  // vertical_fox in radians
+  Camera(Point3 look_from, Point3 look_at, Vector3 v_up, double vertical_fov, double aspect_ratio, double focal_length);
+
+  Ray getRay(double s, double t) const;
 
 private:
   Point3 m_origin;

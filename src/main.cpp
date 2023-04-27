@@ -14,6 +14,7 @@
 #include <memory>
 #include <iostream>
 #include <fmt/core.h>
+#include <math.h>
 
 using namespace raytracing; 
 
@@ -48,14 +49,27 @@ int main(){
     const auto max_depth = 100; //100;
     const auto random_scale = 1.;
     const auto lambertian_diffuse_scatter_type = Lambertian::DiffuseScatterType::RandomUnit;
+
     // Debug 
     const auto freq_info_print = 50;
+
+    // Camera
+    const auto vertical_fov = 20. * M_PI / 180.;
+    // const auto look_from = Point3{0., 0., 0.};
+    // const auto look_at = Point3{0., 0., -1.};
+    const auto look_from = Point3{-2., 2., 1.};
+    const auto look_at = Point3{0., 0., -1.};
+    const auto v_up = Point3{0., 1., 0.};
+    const auto focal_length = 1.;
 
     // Create the materials
     auto material_ground = std::make_unique<Lambertian>(Color{0.8, 0.8, 0.}, lambertian_diffuse_scatter_type);
     auto material_center = std::make_unique<Lambertian>(Color{0.1, 0.2, 0.5});
     auto material_left = std::make_unique<Diaelectric>(2.5);
     auto material_right = std::make_unique<Metal>(Color{0.8, 0.6, 0.2}, 0.);
+
+    // auto material_left = std::make_unique<Lambertian>(Color{0., 0., 1.});
+    // auto material_right = std::make_unique<Lambertian>(Color{1., 0., 0.});
 
     // Add items to the world
     auto world = Hittables{};
@@ -64,11 +78,14 @@ int main(){
     world.add(std::make_unique<Sphere>(Point3{-1, 0, -1}, 0.5, material_left.get()));
     world.add(std::make_unique<Sphere>(Point3{-1, 0, -1}, 0.4, material_left.get()));
     world.add(std::make_unique<Sphere>(Point3{0, -100.5, -1}, 100, material_ground.get())); // "ground" as a sphere
+    
+    // auto world = Hittables{};
+    // auto R = std::cos(M_PI / 4);
+    // world.add(std::make_unique<Sphere>(Point3{-R, 0, -1}, R, material_left.get()));
+    // world.add(std::make_unique<Sphere>(Point3{R, 0, -1}, R, material_right.get()));
 
     // Camera
-    const auto viewport_height = 2.;
-    const auto focal_length = 1.;
-    auto camera = Camera{viewport_height * aspect_ratio, viewport_height, focal_length};
+    auto camera = Camera{look_from, look_at, v_up, vertical_fov, aspect_ratio, focal_length};
 
     // Render
     auto render_start = std::chrono::high_resolution_clock::now();
