@@ -7,10 +7,10 @@
 namespace raytracing
 {
 
-class Diaelectric: public Material
+class Dielectric: public Material
 {
 public:
-  inline Diaelectric(double refraction_index): m_refraction_index{refraction_index} {}
+  inline Dielectric(double refraction_index): m_refraction_index{refraction_index} {}
   
   // returns Ray scattered_ray, Color attenuation
   inline std::optional<std::pair<Ray, Color>> scatter(const Ray& incident_ray, const HitRecord& hit_record) const

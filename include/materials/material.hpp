@@ -1,6 +1,8 @@
 #pragma once
 
 #include <common.hpp>
+#include <color.hpp>
+#include <ray.hpp>
 
 #include <optional>
 #include <utility>

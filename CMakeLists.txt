@@ -9,6 +9,7 @@ link_libraries(fmt::fmt)
 link_libraries(Eigen3::Eigen)
 
 include_directories(include/)
+include_directories(lib/include/)
 
 add_subdirectory(src)
 add_subdirectory(test)

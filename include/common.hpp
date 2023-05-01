@@ -1,8 +1,8 @@
 #pragma once
 
-#include <ray.hpp>
+#include <math.h>
 #include <vec3.hpp>
-#include <color.hpp>
+// #include <color.hpp>
 
 inline double random_double() 
 {
@@ -29,6 +29,16 @@ inline raytracing::Vector3 random_in_unit_sphere() // TODO change method obv
   while (true)
   {
     auto p = random_vec3();
+    if (p.squaredNorm() >= 1) continue;
+    return p;
+  }
+}
+
+inline raytracing::Vector3 random_in_unit_disk() // TODO change method obv
+{
+  while (true)
+  {
+    auto p = raytracing::Vector3{random_double(-1., 1.), random_double(-1., 1.), 0.};
     if (p.squaredNorm() >= 1) continue;
     return p;
   }

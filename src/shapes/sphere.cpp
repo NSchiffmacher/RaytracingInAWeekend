@@ -26,7 +26,7 @@ std::optional<HitRecord> Sphere::hit(const Ray& ray, double t_min, double t_max)
   const auto dot_prod = n.dot(ray.direction());
 
   auto outside_sphere = dot_prod <= 0;
-  return HitRecord{t, p, ray, outside_sphere ? n : -n, outside_sphere, m_material};
+  return HitRecord{t, p, ray, outside_sphere ? n : -n, outside_sphere, m_material.get()};
 }
 
 } // namespace raytracing

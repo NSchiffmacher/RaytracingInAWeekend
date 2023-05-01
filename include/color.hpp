@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <common.hpp>
 // #include <vec3.hpp>
 #include <Eigen/Dense>
 
@@ -11,9 +12,9 @@ class Color
 {
 public:
     inline Color(double r, double g, double b, double a): m_color{r, g, b, a}, m_min{0.}, m_max{1.} { clampValues(); };
-    inline Color(double r, double g, double b): Color{r, g, b, 0.} {};
-    inline Color(double c): Color{c, c, c, 0.} {};
-    inline Color(): Color {0., 0., 0., 0.} {};
+    inline Color(double r, double g, double b): Color{r, g, b, 1.} {};
+    inline Color(double c): Color{c, c, c, 1.} {};
+    inline Color(): Color {0., 0., 0., 1.} {};
     inline Color(const Eigen::Matrix<double, 4, 1>& color): Color{color[0], color[1], color[2], color[3]} {};
 
     inline static Color CustomRangeColor(double min, double max)
@@ -24,6 +25,7 @@ public:
         return c;
     }
     inline static Color CustomRangeColor(double max) { return CustomRangeColor(0., max); }
+    inline static Color random(double min = 0., double max = 1.) { return Color{random_double(min, max), random_double(min, max), random_double(min, max)}; }
 
     inline const Color& clampValues(){
         m_color = m_color.cwiseMin(m_max).cwiseMax(m_min);
